@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+{% block content %}
+
+<h2>Please Fill Out The Form to Sign Up</h2>
+<form method="post">
+	<div class="form-group">
+			<label for "username">username:</label>
+			<p class="text-danger">{{error_name}}</p>
+
+			<input type="text" name="username" class="form-control">
+
+	</div>
+	<div class="form-group">
+			<label for "password">Password:</label>
+			<p class="text-danger">{{error_password}}</p>
+			<p class="text-danger">{{error_verify}}</p>
+			<input type="password" name="password" class="form-control">
+	</div>
+	<div class="form-group">
+			<label for "verify">Verify Password:</label>
+			<input type="password" name="verify" class="form-control">
+	</div>
+	<div class="form-group">
+			<label for "email">Email (optional):</label>
+			<input type="email" name="email" class="form-control">
+	</div>
+
+			<input type="submit" class="btn btn-success" value="Sign Up">
+		</form>
+	</div>
+
+
+{% endblock %}
