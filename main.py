@@ -4,7 +4,6 @@ import random
 import hashlib
 import hmac
 from string import letters
-
 import webapp2
 import jinja2
 
@@ -82,11 +81,6 @@ def make_pw_hash(name, pw, salt = None):
 def valid_pw(name, password, h):
     salt = h.split(',')[0]
     return h == make_pw_hash(name, password, salt)
-def valid_pw(name, password, hashed):
-	salt = bcrypt.gensalt(2)
-	pw_hash = bcrypt.hashpw(password, salt)
-	hashed2 = bcrypt.hashpw(password, pw_hash)
-	return hashed2 == pw_hash
 
 def users_key(group = 'default'):
     return db.Key.from_path('users', group)
@@ -129,9 +123,9 @@ class Post(db.Model):
     subject = db.StringProperty(required = True)
     content = db.TextProperty(required = True)
     created = db.DateTimeProperty(auto_now_add = True)
-    last_modified = db.DateTimeProperty(auto_now = True)
-    author = db.ReferenceProperty(User)
-
+    author = db.StringProperty()
+    likes = db.IntegerProperty()
+    liked_by = db.ListProperty(str)
 
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
@@ -141,7 +135,7 @@ class BlogFront(BlogHandler):
     def get(self):
         posts = greetings = Post.all().order('-created')
         self.render('front.html', posts = posts)
-
+# Blog Posts ===========================================================
 class PostPage(BlogHandler):
     def get(self, post_id):
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
@@ -167,19 +161,86 @@ class NewPost(BlogHandler):
 
         subject = self.request.get('subject')
         content = self.request.get('content')
-
+        author = self.request.get('author')
         if subject and content:
-            p = Post(parent = blog_key(), subject = subject, content = content)
+            p = Post(parent=blog_key(), subject=subject, content=content, author=author, likes=0, liked_by=[])
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
             self.render("newpost.html", subject=subject, content=content, error=error)
+class Delete(BlogHandler):
+    def get(self, post_id):
+        if not self.user:
+            self.redirect('/login')
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            author = post.author
+            loggedUser = self.user.name
 
-class LikePost(db.Model):
-    post = db.ReferenceProperty(Post, required=True)
-    user = db.ReferenceProperty(User, required=True)
-    createdOn = db.DateTimeProperty(auto_now_add=True)
+            if author == loggedUser:
+                key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+                post = db.get(key)
+                post.delete()
+                self.render("delete.html")
+            else:
+                self.redirect("/")
+
+
+class LikePost(BlogHandler):
+    def get(self, post_id):
+        if not self.user:
+            self.redirect('/login')
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            author = post.author
+            logged_user = self.user.name
+
+            if author == logged_user or logged_user in post.liked_by:
+                ## RENDER ERROR
+            else:
+                post.likes += 1
+                post.liked_by.append(logged_user)
+                post.put()
+                self.redirect("/blog")
+class Error(BlogHandler):
+	def get(self):
+		self.render('error.html')
+
+
+class EditPost(BlogHandler):
+    def get(self, post_id):
+        if not self.user:
+            self.redirect('/login')
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            post = db.get(key)
+            author = post.author
+            loggedUser = self.user.name
+
+            if author == loggedUser:
+                key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+                post = db.get(key)
+                error = ""
+                self.render("edit.html", subject=post.subject,
+                            content=post.content, error=error)
+            else:
+                self.redirect("/error")
+                ## DONT REDIRECT TO ERROR
+
+
+    def post(self, post_id):
+        if not self.user:
+            self.redirect("/login")
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            p = db.get(key)
+            p.subject = self.request.get('subject')
+            p.content = self.request.get('content')
+            p.put()
+            self.redirect('/blog/%s' % str(p.key().id()))
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -284,11 +345,15 @@ class Welcome(BlogHandler):
         else:
             self.redirect('/unit2/signup')
 
-app = webapp2.WSGIApplication([('/', MainPage),
+app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/unit2/signup', Unit2Signup),
                                ('/unit2/welcome', Welcome),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
+                              ('/blog/([0-9]+)/edit', EditPost),
+                               ('/blog/([0-9]+)/like', LikePost),
+                               ('/blog/([0-9]+)/delete', Delete),
+                               ('/error', Error),
                                ('/blog/newpost', NewPost),
                                ('/signup', Register),
                                ('/login', Login),
