@@ -1,17 +1,14 @@
 {% extends "index.html" %}
 
 {% block content %}
-<br>
+
 {% if user %}
 	{% if user.name == post.author %}
 	            <h5 class="text-right"><a href="/blog/{{post.key().id()}}/edit">
 	            <i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>
 				EDIT</h5></a>
 				<h5 class="text-right"><a href="/blog/{{post.key().id()}}/removepost" class="like-button"><i class="fa fa-times fa-2x" aria-hidden="true"></i>DELETE</a></h5>
-	            
 
-	{% else %}
-		<a href="/blog/{{post.key().id()}}/like">&#9829; Like</a>
 	{% endif %}
 {% endif %}
 {{post.render() | safe }}

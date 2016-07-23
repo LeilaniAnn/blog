@@ -198,8 +198,13 @@ class LikePost(BlogHandler):
             author = post.author
             logged_user = self.user.name
 
-            if author == logged_user or logged_user in post.liked_by:
-                ## RENDER ERROR
+            if author == logged_user in post.liked_by: 
+                error="You can't like your own post"
+                self.render('error.html', error=error)
+
+            elif logged_user in post.liked_by:
+                error = "You can only like this once!"
+                self.render('error.html', error=error)
             else:
                 post.likes += 1
                 post.liked_by.append(logged_user)
@@ -207,7 +212,7 @@ class LikePost(BlogHandler):
                 self.redirect("/blog")
 class Error(BlogHandler):
 	def get(self):
-		self.render('error.html')
+		self.render('error.html', error=error)
 
 
 class EditPost(BlogHandler):
@@ -227,8 +232,8 @@ class EditPost(BlogHandler):
                 self.render("edit.html", subject=post.subject,
                             content=post.content, error=error)
             else:
-                self.redirect("/error")
-                ## DONT REDIRECT TO ERROR
+                error="you can't edit this"
+                self.redirect("/error", error=error)
 
 
     def post(self, post_id):
