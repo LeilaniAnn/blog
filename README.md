@@ -1,5 +1,5 @@
-# [blog]
-This is the first step to Multiuser Blog Project - so far it is a 'mono-user' Blog
+# [blog](http://blog-1377.appspot.com/blog)
+This is the first step to Multiuser Blog Project - so far it is finished
 
 ## Quick start
 
