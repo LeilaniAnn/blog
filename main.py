@@ -3,7 +3,7 @@ from google.appengine.ext import db
 import time
 
 from views import templates_dir, jinja_env, render_str, render_post
-from models import User, Post, users_key, blog_key
+from models import User, Post, Comment, users_key, blog_key
 from validations import secret, make_secure_val, check_secure_val,valid_username,valid_password,valid_email,make_salt,make_pw_hash,valid_pw
 
 class BlogHandler(webapp2.RequestHandler):
@@ -41,10 +41,10 @@ class BlogHandler(webapp2.RequestHandler):
 
 
 class BlogFront(BlogHandler):
-
     def get(self):
-        posts = greetings = Post.all().order('-created')
+        posts  = Post.all().order('-created')
         self.render('front.html', posts=posts)
+
 
 class PostPage(BlogHandler):
 
@@ -168,6 +168,36 @@ class EditPost(BlogHandler):
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
 
+class NewComment(BlogHandler):
+    def get(self,post_id):
+        if not self.user:
+            self.redirect("/login")
+        else:
+            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+            p = db.get(key)
+            subject = p.subject
+            content = p.content
+            self.render("comments.html", subject=subject, content=content,post_key=p.key())   
+
+    def post(self,post_id):
+        key = db.Key.from_path('Post', int(post_id), parent=blog_key())
+        post = db.get(key)
+        if not post:
+            self.error(404)
+            return
+        if not self.user:
+            self.redirect('/login')
+        comment = self.request.get('comment')
+        if comment:
+            c = Comment(comment=comment, post=post_id, parent = self.user.key())
+            c.put
+            print c.comment # checking if it works
+            self.redirect('/blog/%s' % str(post_id))
+        else:
+            print "this no werk"
+            self.render("permalink.html", post = post,content=content)
+
+
 class Signup(BlogHandler):
 
     def get(self):
@@ -261,6 +291,10 @@ class Unit3Welcome(BlogHandler):
         else:
             self.redirect('/signup')
 
+class MissingPage(BlogHandler):
+  def get(self):
+    self.response.set_status(404)
+    self.render('404.html')
 
 class Welcome(BlogHandler):
 
@@ -274,6 +308,7 @@ class Welcome(BlogHandler):
 app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/unit2/signup', Unit2Signup),
                                ('/unit2/welcome', Welcome),
+                               ('/blog/([0-9]+)/newcomment', NewComment),
                                ('/blog/?', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/([0-9]+)/edit', EditPost),
@@ -285,5 +320,8 @@ app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/login', Login),
                                ('/logout', Logout),
                                ('/unit3/welcome', Unit3Welcome),
+                               ('/.*', MissingPage)
                                ],
                               debug=True)
+
+

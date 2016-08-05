@@ -14,3 +14,8 @@ def render_str(template, **params):
 def render_post(response, post):
     response.out.write('<b>' + post.subject + '</b><br>')
     response.out.write(post.content)
+
+def render_comment(response, comment):
+    response.out.write('<b>' + comment.subject + '</b><br>')
+    response.out.write(comment.content)
+    

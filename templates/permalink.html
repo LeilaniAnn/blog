@@ -10,8 +10,20 @@
 				<h5 class="text-right"><a href="/blog/{{post.key().id()}}/removepost" class="like-button"><i class="fa fa-times fa-2x" aria-hidden="true"></i>DELETE</a></h5>
 
 	{% endif %}
+
 {% endif %}
 {{post.render() | safe }}
+
+
+    <div class="post-comments">
+      <h2>Comments</h2>
+      {% for c in post.comments %}
+
+          {{ c.comments }}
+
+      {% endfor %}
+
+
 
 
 {% endblock %}

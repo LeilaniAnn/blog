@@ -1,29 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>
+    </title>
+</head>
 
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-md-12">
-			<h2>
-				<a href="/blog/{{p.key().id()}}">{{p.subject}}</a>
-			</h2>
-			<h5 style="font-weight:200;">
-				{{p.created.strftime("%b %d, %Y, %I:%M %p")}} by: 
-				<span style="color:#3bb9ff">
-					{{p.author}}
-				</span> 
-					Total likes: 
-				<span style="color:#3bb9ff">
-		<a href="/blog/{{p.key().id()}}/like">
-		<i class="fa fa-thumbs-o-up" aria-hidden="true"></i></a>
-		{{error}}
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12 bg-grey">
+                <h2><a href="/blog/{{p.key().id()}}">{{p.subject}}</a>
+                </h2>
 
-					{{p.likes}}
-				</span>
-			</h5>
-			<hr>
-			<h4>
-				{{p.content}}
-			</h4>
 
-		</div>
-	</div>
+                <h6 style="font-weight:200;">{{p.created.strftime("%b %d, %Y,
+                %I:%M %p")}} by: <span style=
+                "color:#3bb9ff">{{p.author}}</span> Total likes: <span style=
+                "color:#3bb9ff"><a href=
+                "/blog/{{p.key().id()}}/like"><i aria-hidden="true" class=
+                "fa fa-thumbs-o-up"></i></a> {{error}} {{p.likes}}</span></h6>
+				<br>
+
+                <h5>{{p.content}}</h5>
+<div class="comment-count-container">
+  <span class="comment-count">{{p.comments.count()}} comments</span>
+  <a href="/blog/{{p.key().id()}}/newcomment">(add new comment)</a>
 </div>
+
+                <h6 class="text-right"><a href=
+                "/blog/{{p.key().id()}}/newcomment">Add a Comment </a></h6>
+                <br>
+            </div>
+        </div>
+    </div>
+	<br><br>
+
+</body>
+</html>

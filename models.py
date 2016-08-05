@@ -11,6 +11,13 @@ def users_key(group='default'):
 def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
 
+class Comment(db.Model):
+    post = db.StringProperty()
+    comment =db.TextProperty(required=True)
+   
+    @classmethod
+    def render(self):
+        self.render("comments.html")
 
 class User(db.Model):
     name = db.StringProperty(required=True)
@@ -39,7 +46,9 @@ class User(db.Model):
         u = cls.by_name(name)
         if u and valid_pw(name, pw, u.pw_hash):
             return u
-
+    @property
+    def comments(self):
+        return Comment.all().filter( "post = ", str(self.key().id()))
 
 class Post(db.Model):
     subject = db.StringProperty(required=True)
@@ -52,3 +61,8 @@ class Post(db.Model):
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("post.html", p=self)
+
+    @property
+    def comments(self):
+        return Comment.all().filter( "post = ", str(self.key().id()) )
+

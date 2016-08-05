@@ -1,0 +1,9 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+{% for p in comments %}
+{{ p.render() | safe }}
+{% endfor %}
+
+{% endblock %}
