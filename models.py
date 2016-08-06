@@ -11,13 +11,17 @@ def users_key(group='default'):
 def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
 
+
 class Comment(db.Model):
     post = db.StringProperty()
-    comment =db.TextProperty(required=True)
-   
+    comment = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    author = db.StringProperty()
+
     @classmethod
     def render(self):
         self.render("comments.html")
+
 
 class User(db.Model):
     name = db.StringProperty(required=True)
@@ -46,15 +50,18 @@ class User(db.Model):
         u = cls.by_name(name)
         if u and valid_pw(name, pw, u.pw_hash):
             return u
+
     @property
     def comments(self):
-        return Comment.all().filter( "post = ", str(self.key().id()))
+        return Comment.all().filter("post = ", str(self.key().id()))
+
 
 class Post(db.Model):
     subject = db.StringProperty(required=True)
     content = db.TextProperty(required=True)
     created = db.DateTimeProperty(auto_now_add=True)
     author = db.StringProperty()
+    comment = db.StringProperty()
     likes = db.IntegerProperty()
     liked_by = db.ListProperty(str)
 
@@ -64,5 +71,4 @@ class Post(db.Model):
 
     @property
     def comments(self):
-        return Comment.all().filter( "post = ", str(self.key().id()) )
-
+        return Comment.all().filter("post = ", str(self.key().id()))

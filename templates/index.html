@@ -1,119 +1,129 @@
-    <link href=
-    "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-    rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="https://dl.dropboxusercontent.com/s/p12u3xedu5adi17/landing-page.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+<!-- Custom CSS -->
+<link href="https://dl.dropboxusercontent.com/s/4bxmmzxywc2rtv0/landing-page.css" rel="stylesheet">
+<!-- Custom Fonts -->
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="https://fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic,700italic" rel="stylesheet" type="text/css">
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 <style type="text/css">
-    hr.style-two {
-border: 0;
-height: 0;
-border-top: 1px solid rgba(0, 0, 0, 0.1);
-border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-margin-top: -20px;
-width:200px;
-float:left;
+body {
+    font-size: 12px;
 }
-.bg-grey{
+
+hr.style-two {
+    border: 0;
+    height: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    margin-top: -20px;
+    width: 200px;
+    float: left;
+}
+
+.bg-grey {
     background-color: #ededed;
+}
+
+a:visited {
+    color: black;
+    text-decoration: none
+}
+
+a:active {
+    color: black;
+    text-decoration: none
+}
+
+a {
+    color: black;
+    text-decoration: none
+}
+
+.text-muted a {
+    color: grey;
 }
 </style>
 <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
-        <div class="container topnav">
-            <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header">
-                <a class="navbar-brand topnav" href="/blog"><img src="https://dl.dropboxusercontent.com/s/dsv7gqh5l9crs99/skitch.png?dl=0" width="50px" style="margin-top:-10px"></a>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                {% if user %}
-                    <ul class="nav navbar-right navbar-nav">
-                        <li><a href="#">You are logged in as : <b>{{user.name}}</b></a></li>  
-                        <li><a href="/blog/newpost">New Post</a></li>  
-                        <li><a href="/logout">Logout</a></li>
-                    </ul>
-                {% elif not user %}
-                    <ul class="nav navbar-right navbar-nav">
-                        <li><a href="/blog/newpost">New Post</a></li>  
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/signup">Register</a></li>
-                    </ul>
-                {% endif %}
-
-            </div>
-            <!-- /.navbar-collapse -->
+    <div class="container topnav">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand topnav" href="/blog"><img src="https://dl.dropboxusercontent.com/s/dsv7gqh5l9crs99/skitch.png?dl=0" width="50px" style="margin-top:-10px"></a>
         </div>
-        <!-- /.container -->
-    </nav>
-
-
-    <!-- Header -->
-    <div class="intro-header">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="intro-message">
-                        <h1>Multiuser Blog</h1>
-                        <h3>A project for Udacity Nanodegree</h3>
-                        <hr class="intro-divider">
-                    </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            {% if user %}
+            <ul class="nav navbar-right navbar-nav">
+                <li><a href="#"><b>{{user.name}}</b></a></li>
+                <li><a href="/blog/newpost">New Post</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+            {% elif not user %}
+            <ul class="nav navbar-right navbar-nav">
+                <li><a href="/blog/newpost">New Post</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/signup">Register</a></li>
+            </ul>
+            {% endif %}
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+<!-- Header -->
+<div class="intro-header">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="intro-message">
+                    <h1>Multiuser Blog</h1>
+                    <h3>A project for Udacity Nanodegree</h3>
+                    <hr class="intro-divider">
                 </div>
             </div>
-
         </div>
-        <!-- /.container -->
-
     </div>
-    <!-- /.intro-header -->
-
-    <!-- Page Content -->
-
-    <div class="content-section-a">
-        <div class="container">
-                    {% block content %} {% endblock %}
-        </div>
-        <!-- /.container -->
+    <!-- /.container -->
+</div>
+<!-- /.intro-header -->
+<!-- Page Content -->
+<div class="content-section-a">
+    <div class="container">
+        {% block content %} {% endblock %}
     </div>
-    <!-- /.content-section-a -->
-
-
-    <!-- /.content-section-b -->
-
-    <!-- /.banner -->
-
-    <!-- Footer -->
-    <footer style="background-color: #efefef; width:100%;padding:15px;
+    <!-- /.container -->
+</div>
+<!-- /.content-section-a -->
+<!-- /.content-section-b -->
+<!-- /.banner -->
+<!-- Footer -->
+<footer style="background-color: #efefef; width:100%;padding:15px;
 ">
-        <div class="container" >
-            <div class="row text-center">
-                <div class="col-lg-12">
-                    <ul class="list-inline">
-                        <li>
-                            <a href="http://github.com/leilaniann"><i class="fa fa-github-alt fa-2x" aria-hidden="true"></i>
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-lg-12">
+                <ul class="list-inline">
+                    <li>
+                        <a href="http://github.com/leilaniann"><i class="fa fa-github-alt fa-2x" aria-hidden="true"></i>
 </a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="http://facebook.com/leilani.raranga"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
+                    </li>
+                    <li class="footer-menu-divider">&sdot;</li>
+                    <li>
+                        <a href="http://facebook.com/leilani.raranga"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
 </a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="http://linkedin.com/in/leilanir"><i class="fa fa-linkedin fa-2x" aria-hidden="true"></i>
+                    </li>
+                    <li class="footer-menu-divider">&sdot;</li>
+                    <li>
+                        <a href="http://linkedin.com/in/leilanir"><i class="fa fa-linkedin fa-2x" aria-hidden="true"></i>
 </a>
-                        </li>
-                        <li class="footer-menu-divider">&sdot;</li>
-                        <li>
-                            <a href="http://twitter.com/leilanirar"><i class="fa fa-twitter fa-2x" aria-hidden="true"></i>
+                    </li>
+                    <li class="footer-menu-divider">&sdot;</li>
+                    <li>
+                        <a href="http://twitter.com/leilanirar"><i class="fa fa-twitter fa-2x" aria-hidden="true"></i>
 </a>
-                        </li>
-                    </ul>
-                    <p class="copyright text-muted small">Copyright &copy; Leilani Raranga 2016. All Rights Reserved</p>
-                </div>
+                    </li>
+                </ul>
+                <p class="copyright text-muted small">Copyright &copy; Leilani Raranga 2016. All Rights Reserved</p>
             </div>
         </div>
-    </footer>
+    </div>
+</footer>

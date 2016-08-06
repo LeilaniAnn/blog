@@ -4,15 +4,18 @@ import time
 
 from views import templates_dir, jinja_env, render_str, render_post
 from models import User, Post, Comment, users_key, blog_key
-from validations import secret, make_secure_val, check_secure_val,valid_username,valid_password,valid_email,make_salt,make_pw_hash,valid_pw
+from validations import secret, make_secure_val, check_secure_val, valid_username, valid_password, valid_email, make_salt, make_pw_hash, valid_pw
+
+# Main Handler
+
 
 class BlogHandler(webapp2.RequestHandler):
 
     def set_secure_cookie(self, name, val):
         cookie_val = make_secure_val(val)
         self.response.headers.add_header(
-        'Set-Cookie',
-        '%s=%s; Path=/' % (name, cookie_val))
+            'Set-Cookie',
+            '%s=%s; Path=/' % (name, cookie_val))
 
     def read_secure_cookie(self, name):
         cookie_val = self.request.cookies.get(name)
@@ -41,9 +44,24 @@ class BlogHandler(webapp2.RequestHandler):
 
 
 class BlogFront(BlogHandler):
+
     def get(self):
-        posts  = Post.all().order('-created')
-        self.render('front.html', posts=posts)
+        posts = Post.all().order('-created')
+        comments = Comment.all()
+        self.render('front.html', posts=posts, comments=comments)
+
+
+class Error(BlogHandler):
+'''
+    Some pages redirect to an error page that displays their current error
+    will remove this feature as I'd rather have errors displayed directly
+    on page without a new page
+'''
+
+    def get(self):
+        self.render('error.html', error=error)
+
+# Posts operations
 
 
 class PostPage(BlogHandler):
@@ -74,18 +92,22 @@ class NewPost(BlogHandler):
         subject = self.request.get('subject')
         content = self.request.get('content')
         author = self.request.get('author')
+        comment = self.request.get('comment')
         if subject and content:
             p = Post(parent=blog_key(), subject=subject,
-                     content=content, author=author, likes=0, liked_by=[])
+                     content=content, author=author, comment=comment, likes=0, liked_by=[])
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
         else:
             error = "subject and content, please!"
             self.render("newpost.html", subject=subject,
-                        content=content, error=error)
+                        content=content, error=error, comment=comment)
 
 
-class Delete(BlogHandler):
+class DeletePost(BlogHandler):
+    '''
+        user can delete a post.
+    '''
 
     def get(self, post_id):
         if not self.user:
@@ -130,12 +152,6 @@ class LikePost(BlogHandler):
                 self.redirect("/blog")
 
 
-class Error(BlogHandler):
-
-    def get(self):
-        self.render('error.html', error=error)
-
-
 class EditPost(BlogHandler):
 
     def get(self, post_id):
@@ -168,34 +184,81 @@ class EditPost(BlogHandler):
             p.put()
             self.redirect('/blog/%s' % str(p.key().id()))
 
+# All Comment operations
+
+
 class NewComment(BlogHandler):
-    def get(self,post_id):
+
+    def get(self, post_id):
         if not self.user:
             self.redirect("/login")
-        else:
-            key = db.Key.from_path('Post', int(post_id), parent=blog_key())
-            p = db.get(key)
-            subject = p.subject
-            content = p.content
-            self.render("comments.html", subject=subject, content=content,post_key=p.key())   
+            return
+        post = Post.get_by_id(int(post_id), parent=blog_key())
+        subject = post.subject
+        content = post.content
+        comment = self.request.get('comment')
+        author = self.request.get('author')
+        self.render("comments.html", subject=subject, content=content,
+                    author=author, comment=comment, pkey=post.key())
 
-    def post(self,post_id):
+    def post(self, post_id):
+
         key = db.Key.from_path('Post', int(post_id), parent=blog_key())
         post = db.get(key)
+
         if not post:
             self.error(404)
             return
         if not self.user:
-            self.redirect('/login')
+            self.redirect('login')
+        author = self.request.get('author')
         comment = self.request.get('comment')
         if comment:
-            c = Comment(comment=comment, post=post_id, parent = self.user.key())
-            c.put
-            print c.comment # checking if it works
+            c = Comment(comment=comment, post=post_id,
+                        author=author, parent=self.user.key())
+            c.put()
             self.redirect('/blog/%s' % str(post_id))
         else:
-            print "this no werk"
-            self.render("permalink.html", post = post,content=content)
+            self.render("permalink.html", post=post,
+                        content=content, author=author, error=error)
+
+
+class EditComment(BlogHandler):
+
+    def get(self, post_id, comment_id):
+        if not self.user:
+            self.redirect('/login')
+        else:
+            post = Post.get_by_id(int(post_id), parent=blog_key())
+            subject = post.subject
+            content = post.content
+            comment = self.request.get('comment')
+            author = self.request.get('author')
+            self.render("commentpage.html", subject=subject, content=content,
+                        author=author, comment=comment, pkey=post.key())
+
+    def post(self, post_id, comment_id):
+        c = Comment.get_by_id(int(comment_id), parent=self.user.key())
+        if c.parent().key().id() == self.user.key().id():
+            c.comment = self.request.get('comment')
+            c.put()
+            self.redirect('/blog/%s' % str(post_id))
+
+
+class DeleteComment(BlogHandler):
+
+    def get(self, post_id, comment_id):
+        error = ""
+        post = Post.get_by_id(int(post_id), parent=blog_key())
+        comment = Comment.get_by_id(int(comment_id), parent=self.user.key())
+        if comment:
+            comment.delete()
+            self.redirect('/blog/%s' % str(post_id))
+        else:
+            error = "Please only delete your own comment"
+            self.render('permalink.html', error=error, post=post)
+
+# User methods
 
 
 class Signup(BlogHandler):
@@ -291,10 +354,15 @@ class Unit3Welcome(BlogHandler):
         else:
             self.redirect('/signup')
 
+# custom 404 page
+
+
 class MissingPage(BlogHandler):
-  def get(self):
-    self.response.set_status(404)
-    self.render('404.html')
+
+    def get(self):
+        self.response.set_status(404)
+        self.render('404.html')
+
 
 class Welcome(BlogHandler):
 
@@ -305,6 +373,7 @@ class Welcome(BlogHandler):
         else:
             self.redirect('/unit2/signup')
 
+# routes
 app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/unit2/signup', Unit2Signup),
                                ('/unit2/welcome', Welcome),
@@ -313,7 +382,11 @@ app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/blog/([0-9]+)', PostPage),
                                ('/blog/([0-9]+)/edit', EditPost),
                                ('/blog/([0-9]+)/like', LikePost),
-                               ('/blog/([0-9]+)/delete', Delete),
+                               ('/blog/([0-9]+)/deletecomment/([0-9]+)',
+                                DeleteComment),
+                               ('/blog/([0-9]+)/editcomment/([0-9]+)',
+                                EditComment),
+                               ('/blog/([0-9]+)/delete', DeletePost),
                                ('/error', Error),
                                ('/blog/newpost', NewPost),
                                ('/signup', Register),
@@ -323,5 +396,3 @@ app = webapp2.WSGIApplication([('/', BlogFront),
                                ('/.*', MissingPage)
                                ],
                               debug=True)
-
-

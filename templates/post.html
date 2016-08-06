@@ -1,39 +1,42 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-    </title>
-</head>
-
-<body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12 bg-grey">
-                <h2><a href="/blog/{{p.key().id()}}">{{p.subject}}</a>
+<style type="text/css">
+</style>
+<div class="container-fluid">
+    <div class="row blog-post">
+        <div class="col-md-12 ">
+            <h2 class="text-center"><a href="/blog/{{p.key().id()}}">{{p.subject.upper()}}</a>
                 </h2>
-
-
-                <h6 style="font-weight:200;">{{p.created.strftime("%b %d, %Y,
-                %I:%M %p")}} by: <span style=
-                "color:#3bb9ff">{{p.author}}</span> Total likes: <span style=
-                "color:#3bb9ff"><a href=
-                "/blog/{{p.key().id()}}/like"><i aria-hidden="true" class=
-                "fa fa-thumbs-o-up"></i></a> {{error}} {{p.likes}}</span></h6>
-				<br>
-
-                <h5>{{p.content}}</h5>
-<div class="comment-count-container">
-  <span class="comment-count">{{p.comments.count()}} comments</span>
-  <a href="/blog/{{p.key().id()}}/newcomment">(add new comment)</a>
-</div>
-
-                <h6 class="text-right"><a href=
-                "/blog/{{p.key().id()}}/newcomment">Add a Comment </a></h6>
-                <br>
-            </div>
+            <ul class="list-inline text-center text-muted">
+                <li><i class="fa fa-clock-o" aria-hidden="true"></i> {{p.created.strftime("%b %d, %Y, %I:%M %p")}}
+                </li>
+                <li> <i class="fa fa-user" aria-hidden="true"></i> {{p.author}}
+                </li>
+                <li>
+                    <a class="text-muted" href="/blog/{{p.key().id()}}/like"><i aria-hidden="true" class="fa fa-heart"></i> {{p.likes}}</a>
+                </li>
+            </ul>
+            </h6>
+            <br>
+            <p>{{p.content}}</p>
+            <br>
+            <h6 class="text-right text-muted">
+<a href="/blog/{{p.key().id()}}"><i class="fa fa-comment" aria-hidden="true"></i>
+{% if p.comments.count() == 1 %}
+    {{p.comments.count()}} Comment
+{% elif p.comments.count() == 0 %}
+     No Comments
+{% else %}
+    {{p.comments.count()}} Comments
+{% endif %}
+</a>
+   <h6 class="text-right text-muted">
+<a href="/blog/{{p.key().id()}}/newcomment"><i class="fa fa-plus" aria-hidden="true"></i> Add Comment</a>
+</h6>
         </div>
     </div>
-	<br><br>
-
+</div>
+<br>
+<br>
+<br>
 </body>
+
 </html>

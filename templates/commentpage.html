@@ -1,9 +1,29 @@
-{% extends "index.html" %}
-
-{% block content %}
-
-{% for p in comments %}
-{{ p.render() | safe }}
-{% endfor %}
-
-{% endblock %}
+{% extends "index.html" %} {% block content %}
+<div class="row">
+    <form class="comment form-horizontal" method="POST">
+        <fieldset>
+            <!-- Form Name -->
+            <h3 class="text-center">Edit Comment for <br><a href="/blog/{{post_key}}">{{subject}}</a></h3>
+            <br>
+            <p>{{content}}
+                <!-- Text input-->
+                <!-- Textarea -->
+                <div class="form-group">
+                    <input type="hidden" name="author" value="{{user.name}}">
+                    <label class="col-md-4 control-label" for="comment">comment:</label>
+                    <div class="col-md-4">
+                        <textarea class="form-control" id="comment" name="comment" required>{{comment}}</textarea>
+                    </div>
+                </div>
+                <div class="error">{{error}}</div>
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="submit"></label>
+                    <div class="col-md-4">
+                        <button type="submit" id="submit" name="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </div>
+                {% endblock %}
+        </fieldset>
+    </form>
+</div>

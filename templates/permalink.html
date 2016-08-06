@@ -1,29 +1,35 @@
-{% extends "index.html" %}
+<style type="text/css">
+.alignleft {
+    float: left;
+}
 
-{% block content %}
-
-{% if user %}
-	{% if user.name == post.author %}
-	            <h5 class="text-right"><a href="/blog/{{post.key().id()}}/edit">
-	            <i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>
-				EDIT</h5></a>
-				<h5 class="text-right"><a href="/blog/{{post.key().id()}}/removepost" class="like-button"><i class="fa fa-times fa-2x" aria-hidden="true"></i>DELETE</a></h5>
-
-	{% endif %}
-
-{% endif %}
-{{post.render() | safe }}
-
-
-    <div class="post-comments">
-      <h2>Comments</h2>
-      {% for c in post.comments %}
-
-          {{ c.comments }}
-
-      {% endfor %}
-
-
-
-
-{% endblock %}
+.alignright {
+    float: right;
+}
+</style>
+{% extends "index.html" %} {% block content %} {% if user %} {% if user.name == post.author %}
+<h5 class="text-center">	
+<a href="/blog/{{post.key().id()}}/edit">
+<i class="fa fa-pencil-square-o fa-2x" aria-hidden="true"></i>
+EDIT</a>
+<a href="/blog/{{post.key().id()}}/delete" class="like-button"><i class="fa fa-times fa-2x" aria-hidden="true"></i>DELETE</a>
+</h5> {% endif %} {% endif %} {{post.render() | safe }} {% if post.comments %}
+<div class="blog-post">
+    <h3 class="text-center">
+		Comments
+	</h3> {% for c in post.comments %}
+    <div id="textbox">
+        <p class="alignleft">
+            <b><span class="text-muted" style="font-size:14px;">{{ c.parent().name }} </b></span>| &nbsp;{{ c.comment }}
+        </p>
+        {% if user.name == c.parent().name %}
+        <p class="alignright">
+            <a href="/blog/{{post.key().id()}}/editcomment/{{c.key().id()}}">edit</a> |
+            <a href="/blog/{{post.key().id()}}/deletecomment/{{c.key().id()}}">delete</a>
+        </p>
+        {% endif %}
+    </div>
+    <div style="clear: both;"></div>
+    <hr> {% endfor %} {% endif %}
+</div>
+<br> {% endblock %}
