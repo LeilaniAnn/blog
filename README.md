@@ -1,14 +1,28 @@
 # [blog](http://blog-1377.appspot.com/blog)
-This is the first step to Multiuser Blog Project - so far it is finished
+This is a project for Udacity's Full Stack Nanodegree: Multiuser Blog Project 
+
+## Features
+<ul>
+  <li>Login/Registration</li>
+  <li>CRUD Post operations</li>
+  <li>Add 'likes' to other's posts</li>
+  <li>CRUD comment operations</li>
+</ul>
 
 ## Quick start
 
-Several quick start options are available:
+First, download the [Google App Engine SDK](https://cloud.google.com/appengine/docs/python)
+and open the launcher application to create the symlinks you'll need to run `dev_appserver.py`
+in the terminal.
 
-* Download python 2.7 (https://www.python.org/downloads/release/python-2711/)
-* Clone the repo: `git clone https://github.com/leilaniann/blog.git`.
-* CD blog
-* `python main.py`
+To run this app locally, you need **python2** and **App Engine Python SDK** installed. Launch application with command:
+
+```
+python dev_appserver.py app.yaml
+```
+
+Go to http://localhost:2080
+to see the blog app running and http://localhost:8004 for the admin console!
 
 
 ## Creator
