@@ -1,8 +1,9 @@
 from google.appengine.ext import db
 from views import render_str
 
-from validations import secret, make_secure_val, check_secure_val, valid_username, valid_password, valid_email, make_salt, make_pw_hash, valid_pw
-
+from validations import (secret, make_secure_val, check_secure_val, 
+                        valid_username, valid_password, valid_email, 
+                        make_salt, make_pw_hash, valid_pw)
 
 def users_key(group='default'):
     return db.Key.from_path('users', group)

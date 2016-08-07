@@ -4,7 +4,9 @@ import time
 
 from views import templates_dir, jinja_env, render_str, render_post
 from models import User, Post, Comment, users_key, blog_key
-from validations import secret, make_secure_val, check_secure_val, valid_username, valid_password, valid_email, make_salt, make_pw_hash, valid_pw
+from validations import (secret, make_secure_val, check_secure_val,
+                         valid_username, valid_password, valid_email,
+                         make_salt, make_pw_hash, valid_pw)
 
 # Main Handler
 
@@ -50,13 +52,14 @@ class BlogFront(BlogHandler):
         comments = Comment.all()
         self.render('front.html', posts=posts, comments=comments)
 
-
-class Error(BlogHandler):
 '''
     Some pages redirect to an error page that displays their current error
     will remove this feature as I'd rather have errors displayed directly
     on page without a new page
 '''
+
+
+class Error(BlogHandler):
 
     def get(self):
         self.render('error.html', error=error)
@@ -80,14 +83,15 @@ class PostPage(BlogHandler):
 class NewPost(BlogHandler):
 
     def get(self):
-        if self.user:
-            self.render("newpost.html")
+        if not self.user:
+            return self.redirect("/login")
+
         else:
-            self.redirect("/login")
+            self.render("newpost.html")
 
     def post(self):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
 
         subject = self.request.get('subject')
         content = self.request.get('content')
@@ -111,7 +115,7 @@ class DeletePost(BlogHandler):
 
     def get(self, post_id):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         else:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
@@ -131,7 +135,7 @@ class LikePost(BlogHandler):
 
     def get(self, post_id):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         else:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
@@ -156,7 +160,7 @@ class EditPost(BlogHandler):
 
     def get(self, post_id):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         else:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             post = db.get(key)
@@ -175,7 +179,7 @@ class EditPost(BlogHandler):
 
     def post(self, post_id):
         if not self.user:
-            self.redirect("/login")
+            return self.redirect("/login")
         else:
             key = db.Key.from_path('Post', int(post_id), parent=blog_key())
             p = db.get(key)
@@ -191,8 +195,7 @@ class NewComment(BlogHandler):
 
     def get(self, post_id):
         if not self.user:
-            self.redirect("/login")
-            return
+            return self.redirect("/login")
         post = Post.get_by_id(int(post_id), parent=blog_key())
         subject = post.subject
         content = post.content
@@ -210,7 +213,7 @@ class NewComment(BlogHandler):
             self.error(404)
             return
         if not self.user:
-            self.redirect('login')
+            return self.redirect('login')
         author = self.request.get('author')
         comment = self.request.get('comment')
         if comment:
@@ -227,7 +230,7 @@ class EditComment(BlogHandler):
 
     def get(self, post_id, comment_id):
         if not self.user:
-            self.redirect('/login')
+            return self.redirect('/login')
         else:
             post = Post.get_by_id(int(post_id), parent=blog_key())
             subject = post.subject
@@ -238,6 +241,8 @@ class EditComment(BlogHandler):
                         author=author, comment=comment, pkey=post.key())
 
     def post(self, post_id, comment_id):
+        if not self.user:
+            return self.redirect('/login')
         c = Comment.get_by_id(int(comment_id), parent=self.user.key())
         if c.parent().key().id() == self.user.key().id():
             c.comment = self.request.get('comment')
@@ -248,6 +253,8 @@ class EditComment(BlogHandler):
 class DeleteComment(BlogHandler):
 
     def get(self, post_id, comment_id):
+        if not self.user:
+            return self.redirect('/login')
         error = ""
         post = Post.get_by_id(int(post_id), parent=blog_key())
         comment = Comment.get_by_id(int(comment_id), parent=self.user.key())
